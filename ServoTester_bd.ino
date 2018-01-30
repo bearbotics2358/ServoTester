@@ -23,6 +23,9 @@
  * - build pot is 10k, 500uA, so about 800uA total
  * - sleep_bod_disable() won't compile, would save 20uA
  * - power_aca_disable() won't compile, would save 35uA
+ * updated 1/29/18
+ * - invert outputs:
+ * for pcb's, LEDs connected to VCC, with pin pulling down
  */
 
 #include <SoftwareServo.h>
@@ -70,15 +73,15 @@ void setup(){
   pinMode(RED_LED, OUTPUT);        
   pinMode(YELLOW_LED, OUTPUT);        
 
-  digitalWrite(GREEN_LED, 1);
-  digitalWrite(RED_LED, 1);
-  digitalWrite(YELLOW_LED, 1);
-  
-  delay(200);
-  
   digitalWrite(GREEN_LED, 0);
   digitalWrite(RED_LED, 0);
   digitalWrite(YELLOW_LED, 0);
+  
+  delay(200);
+  
+  digitalWrite(GREEN_LED, 1);
+  digitalWrite(RED_LED, 1);
+  digitalWrite(YELLOW_LED, 1);
   
   // Initialize potValue so that output will start at the correct value
   potValue = getCleanReading();
@@ -117,37 +120,37 @@ void loop(){
     // use ledFlashChange to hold delta time, then update at the end of the if's 
     if(servoPulse <= SOFT_MIN) {
       // Solid RED
-      digitalWrite(GREEN_LED, 0);
-      digitalWrite(RED_LED, 1);
-      digitalWrite(YELLOW_LED, 0);
+      digitalWrite(GREEN_LED, 1);
+      digitalWrite(RED_LED, 0);
+      digitalWrite(YELLOW_LED, 1);
       ledFlashChange = 50000;
     } 
     else if(servoPulse < DEAD_MIN) {
       // Flashing RED
-      digitalWrite(GREEN_LED, 0);
+      digitalWrite(GREEN_LED, 1);
       digitalWrite(RED_LED, !digitalRead(RED_LED));
-      digitalWrite(YELLOW_LED, 0);
+      digitalWrite(YELLOW_LED, 1);
       ledFlashChange = map(servoPulse, SOFT_MIN, DEAD_MIN, 50000, 250000);
     } 
     else if(servoPulse <= DEAD_MAX) {
       // Solid Yellow
-      digitalWrite(GREEN_LED, 0);
-      digitalWrite(RED_LED, 0);
-      digitalWrite(YELLOW_LED, 1);
+      digitalWrite(GREEN_LED, 1);
+      digitalWrite(RED_LED, 1);
+      digitalWrite(YELLOW_LED, 0);
       ledFlashChange = 50000;
     } 
     else if(servoPulse < SOFT_MAX) {
       // Flashing Green
       digitalWrite(GREEN_LED, !digitalRead(GREEN_LED));
-      digitalWrite(RED_LED, 0);
-      digitalWrite(YELLOW_LED, 0);
+      digitalWrite(RED_LED, 1);
+      digitalWrite(YELLOW_LED, 1);
       ledFlashChange = map(servoPulse, DEAD_MAX, SOFT_MAX, 250000, 50000);
     } 
     else {
       // Solid Green
-      digitalWrite(GREEN_LED, 1);
-      digitalWrite(RED_LED, 0);
-      digitalWrite(YELLOW_LED, 0);
+      digitalWrite(GREEN_LED, 0);
+      digitalWrite(RED_LED, 1);
+      digitalWrite(YELLOW_LED, 1);
       ledFlashChange = 50000;
     }
     // update ledFlashChange to actual time
@@ -188,13 +191,13 @@ void sleepNow()
   sleep_enable();
  
   // indicate to user
-  digitalWrite(GREEN_LED, 1);
-  digitalWrite(RED_LED, 1);
-  digitalWrite(YELLOW_LED, 1);
-  delay(500);
   digitalWrite(GREEN_LED, 0);
   digitalWrite(RED_LED, 0);
   digitalWrite(YELLOW_LED, 0);
+  delay(500);
+  digitalWrite(GREEN_LED, 1);
+  digitalWrite(RED_LED, 1);
+  digitalWrite(YELLOW_LED, 1);
 
   // start shutting down peripherals
   servo.detach();
